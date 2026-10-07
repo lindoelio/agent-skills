@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/postal-code.schema.json",
+  "title": "Postal code by country",
+  "type": "object",
+  "properties": {
+    "country": { "enum": ["United States of America", "Canada"] },
+    "postal_code": { "type": "string" }
+  },
+  "if": {
+    "properties": { "country": { "const": "Canada" } },
+    "required": ["country"]
+  },
+  "then": {
+    "properties": { "postal_code": { "pattern": "^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$" } }
+  },
+  "else": {
+    "properties": { "postal_code": { "pattern": "^[0-9]{5}(-[0-9]{4})?$" } }
+  }
+}

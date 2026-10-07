@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/product.schema.json",
+  "title": "Product",
+  "description": "A product in the catalog",
+  "type": "object",
+  "properties": {
+    "productId": { "type": "integer" },
+    "productName": { "type": "string", "minLength": 1 },
+    "price": { "type": "number", "exclusiveMinimum": 0 }
+  },
+  "required": ["productId", "productName", "price"],
+  "additionalProperties": false
+}

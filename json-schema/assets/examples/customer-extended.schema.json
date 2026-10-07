@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/customer-extended.schema.json",
+  "type": "object",
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "street_address": { "type": "string" },
+        "city": { "type": "string" }
+      },
+      "required": ["street_address", "city"]
+    }
+  ],
+  "properties": {
+    "type": { "enum": ["residential", "business"] }
+  },
+  "required": ["type"],
+  "unevaluatedProperties": false
+}

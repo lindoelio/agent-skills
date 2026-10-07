@@ -16,6 +16,7 @@ These skills are compatible with tools like [Claude Code](https://claude.ai/code
 | [bootstrap-5](./bootstrap-5) | Build modern, responsive, accessible web interfaces using pure Bootstrap 5. Covers grid system, flexbox utilities, spacing, colors, typography, forms, buttons, cards, modals, navbars, and more. |
 | [contextual-stewardship](./contextual-stewardship) | Extract, curate, and persist architectural decisions, business rules, and workflows into long-term memory using graceful degradation (MCP Context → local TOON file). |
 | [long-running-work-planning](./long-running-work-planning) | Break down ambiguous problems, explore alternatives, and maintain work continuity across extended tasks with structured incremental reasoning. |
+| [json-schema](./json-schema) | Author, review, debug, migrate, and explain JSON Schema with verifiable Draft 2020-12 correctness, complete keyword coverage, and executable validation checks. |
 | [quality-grading](./quality-grading) | Grade code, specifications, or design documents across four quality dimensions with a 1-5 scoring scale and auto-improvement for artifacts below threshold. |
 
 ## Installation

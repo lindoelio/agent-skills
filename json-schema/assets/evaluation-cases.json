@@ -1,0 +1,242 @@
+{
+  "dialect": "https://json-schema.org/draft/2020-12/schema",
+  "cases": [
+    {
+      "id": "product-closed",
+      "kind": "validation",
+      "description": "Closed product object distinguishes missing, null, wrong type, and extra properties.",
+      "schema_file": "examples/product-closed.schema.json",
+      "tests": [
+        {"description": "valid product", "instance": {"productId": 1, "productName": "Door", "price": 12.5}, "valid": true},
+        {"description": "missing required price", "instance": {"productId": 1, "productName": "Door"}, "valid": false, "expected": {"validator": "required", "instancePath": []}},
+        {"description": "null is not a string", "instance": {"productId": 1, "productName": null, "price": 12.5}, "valid": false, "expected": {"validator": "type", "instancePath": ["productName"]}},
+        {"description": "zero price violates exclusiveMinimum", "instance": {"productId": 1, "productName": "Door", "price": 0}, "valid": false, "expected": {"validator": "exclusiveMinimum", "instancePath": ["price"]}},
+        {"description": "extra property closed", "instance": {"productId": 1, "productName": "Door", "price": 12.5, "color": "green"}, "valid": false, "expected": {"validator": "additionalProperties", "instancePath": []}},
+        {"description": "wrong productId type", "instance": {"productId": "1", "productName": "Door", "price": 12.5}, "valid": false, "expected": {"validator": "type", "instancePath": ["productId"]}}
+      ]
+    },
+    {
+      "id": "tuple-closed",
+      "kind": "validation",
+      "description": "prefixItems needs explicit closure and length constraints.",
+      "schema_file": "examples/tuple-closed.schema.json",
+      "tests": [
+        {"description": "exact tuple", "instance": [1600, "Pennsylvania"], "valid": true},
+        {"description": "short tuple rejected by minItems", "instance": [1600], "valid": false, "expected": {"validator": "minItems", "instancePath": []}},
+        {"description": "extra item rejected by closed tuple", "instance": [1600, "Pennsylvania", "Extra"], "valid": false, "expected": {"validator": "maxItems", "instancePath": []}},
+        {"description": "wrong position type", "instance": ["Pennsylvania", 1600], "valid": false, "expected": {"validator": "type", "instancePath": [0]}}
+      ]
+    },
+    {
+      "id": "type-applicability",
+      "kind": "validation",
+      "description": "Type-specific assertions ignore non-target types.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "type": ["string", "null"], "maxLength": 3},
+      "tests": [
+        {"description": "short string passes", "instance": "AB", "valid": true},
+        {"description": "null passes union", "instance": null, "valid": true},
+        {"description": "long string fails maxLength", "instance": "ABCD", "valid": false, "expected": {"validator": "maxLength", "instancePath": []}},
+        {"description": "number fails type union", "instance": 12345, "valid": false, "expected": {"validator": "type", "instancePath": []}}
+      ]
+    },
+    {
+      "id": "integer-precision",
+      "kind": "validation",
+      "description": "Integer means zero fractional part, including 1.0.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "type": "integer"},
+      "tests": [
+        {"description": "plain integer", "instance": 42, "valid": true},
+        {"description": "zero fractional part", "instance": 1.0, "valid": true},
+        {"description": "fractional rejected", "instance": 3.14, "valid": false, "expected": {"validator": "type", "instancePath": []}},
+        {"description": "string rejected", "instance": "42", "valid": false, "expected": {"validator": "type", "instancePath": []}}
+      ]
+    },
+    {
+      "id": "pattern-unanchored",
+      "kind": "validation",
+      "description": "Patterns match anywhere unless anchored.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "type": "string", "pattern": "p"},
+      "tests": [
+        {"description": "substring match", "instance": "apple", "valid": true},
+        {"description": "no substring means no match", "instance": "ABC", "valid": false, "expected": {"validator": "pattern", "instancePath": []}}
+      ]
+    },
+    {
+      "id": "oneof-overlap",
+      "kind": "validation",
+      "description": "oneOf requires exactly one branch.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "oneOf": [{"multipleOf": 5}, {"multipleOf": 3}]},
+      "tests": [
+        {"description": "only multiple of 5", "instance": 10, "valid": true},
+        {"description": "only multiple of 3", "instance": 9, "valid": true},
+        {"description": "multiple of both fails oneOf", "instance": 15, "valid": false, "expected": {"validator": "oneOf", "instancePath": []}},
+        {"description": "multiple of neither fails oneOf", "instance": 2, "valid": false, "expected": {"validator": "oneOf", "instancePath": []}}
+      ]
+    },
+    {
+      "id": "conditional-postal",
+      "kind": "validation",
+      "description": "if requires country; absence fails if and selects else.",
+      "schema_file": "examples/conditional-postal.schema.json",
+      "tests": [
+        {"description": "canada format", "instance": {"country": "Canada", "postal_code": "K1M 1M4"}, "valid": true},
+        {"description": "canada wrong format fails then", "instance": {"country": "Canada", "postal_code": "10000"}, "valid": false, "expected": {"validator": "pattern", "instancePath": ["postal_code"]}},
+        {"description": "absent country selects else USA pattern", "instance": {"postal_code": "20500"}, "valid": true},
+        {"description": "absent country with canadian code fails else", "instance": {"postal_code": "K1M 1M4"}, "valid": false, "expected": {"validator": "pattern", "instancePath": ["postal_code"]}}
+      ]
+    },
+    {
+      "id": "dependent-required",
+      "kind": "validation",
+      "description": "dependentRequired is unidirectional.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "properties": {"credit_card": {"type": "number"}, "billing_address": {"type": "string"}}, "dependentRequired": {"credit_card": ["billing_address"]}},
+      "tests": [
+        {"description": "both present", "instance": {"credit_card": 123, "billing_address": "Lane"}, "valid": true},
+        {"description": "trigger without dependent fails", "instance": {"credit_card": 123}, "valid": false, "expected": {"validator": "dependentRequired", "instancePath": []}},
+        {"description": "dependent without trigger passes", "instance": {"billing_address": "Lane"}, "valid": true}
+      ]
+    },
+    {
+      "id": "additional-vs-unevaluated",
+      "kind": "validation",
+      "description": "additionalProperties sees only the same schema object, so cross-branch a is unexpected.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "allOf": [{"type": "object", "properties": {"a": {"type": "string"}}}], "properties": {"b": {"type": "string"}}, "additionalProperties": false},
+      "tests": [
+        {"description": "cross-branch a rejected by same-schema additionalProperties", "instance": {"a": "x", "b": "y"}, "valid": false, "expected": {"validator": "additionalProperties", "instancePath": []}}
+      ]
+    },
+    {
+      "id": "additional-vs-unevaluated-pass",
+      "kind": "validation",
+      "description": "Same shape with unevaluatedProperties permits cross-branch properties.",
+      "schema_file": "examples/customer-extended.schema.json",
+      "tests": [
+        {"description": "extended valid", "instance": {"street_address": "1600 PA Ave", "city": "DC", "type": "business"}, "valid": true},
+        {"description": "unknown property closed", "instance": {"street_address": "1600 PA Ave", "city": "DC", "type": "business", "zzz": 1}, "valid": false, "expected": {"validator": "unevaluatedProperties", "instancePath": []}}
+      ]
+    },
+    {
+      "id": "ref-sibling",
+      "kind": "validation",
+      "description": "Siblings beside $ref apply in 2020-12.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://example.com/ref-sibling", "$defs": {"name": {"type": "string", "minLength": 2}}, "type": "object", "properties": {"n": {"$ref": "#/$defs/name", "maxLength": 3}}},
+      "tests": [
+        {"description": "both constraints pass", "instance": {"n": "AB"}, "valid": true},
+        {"description": "ref minLength fails", "instance": {"n": "A"}, "valid": false, "expected": {"validator": "minLength", "instancePath": ["n"]}},
+        {"description": "sibling maxLength fails", "instance": {"n": "ABCD"}, "valid": false, "expected": {"validator": "maxLength", "instancePath": ["n"]}}
+      ]
+    },
+    {
+      "id": "dynamic-tree",
+      "kind": "validation",
+      "description": "Strict-tree override applies recursively through dynamic scope. Adapted from Core Appendix C.",
+      "schema_file": "examples/tree-strict.schema.json",
+      "registry": ["examples/tree-base.schema.json", "examples/tree-strict.schema.json"],
+      "tests": [
+        {"description": "clean nested child", "instance": {"children": [{"data": 1}]}, "valid": true},
+        {"description": "misspelled nested property rejected", "instance": {"children": [{"daat": 1}]}, "valid": false, "expected": {"validator": "unevaluatedProperties", "instancePath": ["children", 0]}}
+      ]
+    },
+    {
+      "id": "format-annotation",
+      "kind": "validation",
+      "description": "Invalid format is annotation-only by default. From official test suite.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "format": "email"},
+      "tests": [
+        {"description": "invalid email still valid", "instance": "2962", "valid": true},
+        {"description": "non-string ignored", "instance": 12, "valid": true}
+      ]
+    },
+    {
+      "id": "format-assertion-enabled",
+      "kind": "format-assertion",
+      "description": "Same schema rejects invalid email only when format assertion is explicitly enabled.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "format": "email"},
+      "tests": [
+        {"description": "invalid email fails with assertion enabled", "instance": "2962", "valid": false, "expected": {"validator": "format", "instancePath": []}},
+        {"description": "non-string still ignored with assertion enabled", "instance": 12, "valid": true}
+      ]
+    },
+    {
+      "id": "content-annotation",
+      "kind": "validation",
+      "description": "Invalid encoded content remains valid. From official test suite.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "contentMediaType": "application/json"},
+      "tests": [
+        {"description": "invalid JSON document still valid", "instance": "{:}", "valid": true},
+        {"description": "non-string ignored", "instance": 100, "valid": true}
+      ]
+    },
+    {
+      "id": "default-annotation",
+      "kind": "validation",
+      "description": "Invalid default does not affect validity. From official test suite.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "properties": {"foo": {"type": "integer", "default": []}}},
+      "tests": [
+        {"description": "explicit valid property", "instance": {"foo": 13}, "valid": true},
+        {"description": "missing property with invalid default", "instance": {}, "valid": true}
+      ]
+    },
+    {
+      "id": "unknown-keyword-annotation",
+      "kind": "validation",
+      "description": "Unknown keywords do not fail validation; known keywords still apply.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "type": "string", "unknownKeyword": {"nested": true}},
+      "tests": [
+        {"description": "string passes despite unknown keyword", "instance": "x", "valid": true},
+        {"description": "wrong type still fails", "instance": 1, "valid": false, "expected": {"validator": "type", "instancePath": []}}
+      ]
+    },
+    {
+      "id": "not-single-schema",
+      "kind": "validation",
+      "description": "not takes exactly one schema, not an array.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "not": {"type": "string"}},
+      "tests": [
+        {"description": "number passes not-string", "instance": 42, "valid": true},
+        {"description": "string fails not-string", "instance": "x", "valid": false, "expected": {"validator": "not", "instancePath": []}}
+      ]
+    },
+    {
+      "id": "bundling-equivalence",
+      "kind": "validation",
+      "description": "Bundled embedded resource resolves without rewriting $ref.",
+      "schema_file": "examples/customer-bundled.schema.json",
+      "tests": [
+        {"description": "valid bundled reference", "instance": {"first_name": "Ada", "shipping_address": {"street": "Main", "city": "DC"}}, "valid": true},
+        {"description": "invalid embedded property", "instance": {"first_name": "Ada", "shipping_address": {"street": "Main"}}, "valid": false, "expected": {"validator": "required", "instancePath": ["shipping_address"]}}
+      ]
+    },
+    {
+      "id": "schema-invalid-keywords",
+      "kind": "schema-invalid",
+      "description": "Meta-schema violations must fail schema validation, not instance validation.",
+      "schemas": [
+        {"description": "negative minLength", "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "minLength": -1}},
+        {"description": "unknown type name", "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "type": "wat"}},
+        {"description": "duplicate required entries", "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "required": ["x", "x"]}},
+        {"description": "empty prefixItems", "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "prefixItems": []}},
+        {"description": "draft-04 boolean exclusiveMinimum", "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "exclusiveMinimum": true}}
+      ]
+    },
+    {
+      "id": "unresolved-ref",
+      "kind": "unresolved-ref",
+      "description": "Unknown remote references must fail closed, not validate normally.",
+      "schema": {"$schema": "https://json-schema.org/draft/2020-12/schema", "$ref": "https://example.com/does-not-exist.json"},
+      "tests": [
+        {"description": "unresolved reference raises", "instance": {"anything": 1}}
+      ]
+    },
+    {
+      "id": "output-conformance",
+      "kind": "output-conformance",
+      "description": "Flag, basic, and detailed outputs must satisfy the official output schema.",
+      "samples": [
+        {"description": "flag output", "output": {"valid": false}},
+        {"description": "basic error output", "output": {"valid": false, "keywordLocation": "", "instanceLocation": "", "errors": [{"valid": false, "keywordLocation": "/minItems", "instanceLocation": "", "error": "Expected at least 3 items"}]}},
+        {"description": "detailed output", "output": {"valid": false, "keywordLocation": "", "instanceLocation": "", "errors": [{"valid": false, "keywordLocation": "/items/$ref", "absoluteKeywordLocation": "https://example.com/polygon#/$defs/point", "instanceLocation": "/1", "errors": [{"valid": false, "keywordLocation": "/items/$ref/required", "absoluteKeywordLocation": "https://example.com/polygon#/$defs/point/required", "instanceLocation": "/1", "error": "Required property y not found."}]}]}}
+      ]
+    }
+  ]
+}

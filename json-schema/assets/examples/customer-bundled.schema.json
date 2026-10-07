@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/customer",
+  "type": "object",
+  "properties": {
+    "first_name": { "type": "string" },
+    "shipping_address": { "$ref": "https://example.com/schemas/address" }
+  },
+  "required": ["first_name", "shipping_address"],
+  "$defs": {
+    "address-resource": {
+      "$id": "https://example.com/schemas/address",
+      "type": "object",
+      "properties": {
+        "street": { "type": "string" },
+        "city": { "type": "string" }
+      },
+      "required": ["street", "city"],
+      "additionalProperties": false
+    }
+  }
+}

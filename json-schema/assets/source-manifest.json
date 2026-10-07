@@ -1,0 +1,79 @@
+{
+  "dialect": "https://json-schema.org/draft/2020-12/schema",
+  "dialect_published": "2022-06-16",
+  "manifest_retrieved": "2026-10-07",
+  "authoritative_specs": [
+    {
+      "name": "JSON Schema Core 2020-12",
+      "url": "https://json-schema.org/draft/2020-12/json-schema-core",
+      "sections_used": ["4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "A", "B", "C", "D", "E"]
+    },
+    {
+      "name": "JSON Schema Validation 2020-12",
+      "url": "https://json-schema.org/draft/2020-12/json-schema-validation",
+      "sections_used": ["4", "5", "6", "7", "8", "9", "10", "A"]
+    },
+    {
+      "name": "2020-12 Release Notes",
+      "url": "https://json-schema.org/draft/2020-12/release-notes"
+    },
+    {
+      "name": "RFC 6901 JSON Pointer",
+      "url": "https://www.rfc-editor.org/rfc/rfc6901"
+    },
+    {
+      "name": "Relative JSON Pointer",
+      "url": "https://json-schema.org/draft/2020-12/relative-json-pointer.html"
+    },
+    {
+      "name": "RFC 3986 URI Generic Syntax section 5",
+      "url": "https://www.rfc-editor.org/rfc/rfc3986.txt"
+    }
+  ],
+  "pinning": "Vendored meta-schemas, keyword registry, and evaluation fixtures are pinned by SHA-256 below. Remote specification URLs are identified by URL plus manifest_retrieved because upstream HTML rendering is not content-stable.",
+  "vendored_metaschemas": [
+    {"path": "official-metaschemas/schema.json", "sha256": "41da76f5afb7ce062d248f762463a92f7ca47e4e0f905b224ba6afeef91ded0f"},
+    {"path": "official-metaschemas/meta-core.json", "sha256": "21f79d143fab1f180245c331e5657057045b36794d41fe151e6e4fed65035299"},
+    {"path": "official-metaschemas/meta-applicator.json", "sha256": "bf273b26f9f735b93ece78f2b61b36676e1d122ce78ab37ad5a2e45dfa1ca2b1"},
+    {"path": "official-metaschemas/meta-validation.json", "sha256": "e921c5b79264d3689af01c1af1ffdf692e09f1c45df90a0f08eb7288c9acdeab"},
+    {"path": "official-metaschemas/meta-unevaluated.json", "sha256": "fc99f32188da41689a9382af174dd42e8b255e4374965c157b8286556b4ab2bc"},
+    {"path": "official-metaschemas/meta-format-annotation.json", "sha256": "5c79404f831dd905c0f40fefac7c6f3e51bf3729b4a876a5c2020178d97f3bcc"},
+    {"path": "official-metaschemas/meta-format-assertion.json", "sha256": "6a5a8e13c605e3eff51f9bf8da18078880d81ff1634e391760ccc2e16ee2146f"},
+    {"path": "official-metaschemas/meta-content.json", "sha256": "a10456605b2b5bb12a1b4dcfc0300f02f54d3e8bb3646bed7724583866627682"},
+    {"path": "official-metaschemas/meta-meta-data.json", "sha256": "c664d438a84d58889c8edecd248ce2f945a4bc0e3b087323b11303dc136abfbe"},
+    {"path": "official-metaschemas/output-schema.json", "sha256": "50d74de4f87de12e14d0ce45ad39343896bd2ebb6199047ef82c09ca11499249"}
+  ],
+  "pinned_assets": [
+    {"path": "keyword-registry.json", "sha256": "cf067e33ed35e8f8d4cff8c6cf3fbd267fdf1e447afeb866d9f20dcce4632550"},
+    {"path": "evaluation-cases.json", "sha256": "b479e36bbbe86d23b33aab4e0a47ec07183a0859e71b6d51e3a8e7a5505c6f8d"}
+  ],
+  "dependencies": {
+    "python": ">=3.9",
+    "tested": [
+      {"package": "jsonschema", "version": "4.26.0"},
+      {"package": "referencing", "version": "0.37.0"}
+    ]
+  },
+  "guides_used": [
+    "Understanding JSON Schema basics, type, string, numeric, object, array, combining, conditionals, composition, structuring, schema, generic, enum, const, metadata, annotations, comments, non_json_data, regular_expressions",
+    "Getting started step-by-step product and nested-object tutorial",
+    "File-system modeling guide",
+    "Miscellaneous and domain examples",
+    "Implementers interfaces",
+    "Specification links and migration notes"
+  ],
+  "test_suite": {
+    "repository": "https://github.com/json-schema-org/JSON-Schema-Test-Suite",
+    "pinned_cases": ["format default annotation behavior", "content annotation behavior", "default annotation behavior", "unknown keyword annotation behavior", "schema-invalid keyword shapes", "unresolved reference behavior", "output schema conformance", "bundled resource equivalence"]
+  },
+  "known_discrepancies": [
+    "Guide lists 'regular expressions' as a type value; specification allows only array, boolean, integer, null, number, object, string.",
+    "Composition overview implies not takes an array; specification requires exactly one schema.",
+    "Some guide examples retain obsolete additionalItems, definitions, dependencies, boolean exclusiveMinimum/exclusiveMaximum, or placeholders."
+  ],
+  "ambiguity_acknowledged": {
+    "issue": "https://github.com/json-schema-org/json-schema-spec/issues/1172",
+    "adr": "https://raw.githubusercontent.com/json-schema-org/json-schema-spec/main/adr/2022-04-08-cref-for-ambiguity-and-fix-later-gh-spec-issue-1172.md",
+    "effect": "additionalProperties detailed output may differ; validation result is unaffected"
+  }
+}
